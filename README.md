@@ -1,5 +1,11 @@
 # projet_IA04
 
-## Sujets ? 
+### Systemes emergents, changement de comportement locaux conditionné par la musique
 
-### systemes emergents - fourmis, quelles questions cherchent ont à investiguer ?   
+### Implementation de différents systemes 
+
+#### Primordial particle systems
+
+#### Boids
+
+#### Lime
