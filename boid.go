@@ -6,16 +6,21 @@ import(
 	"math/rand"
 	"time"
 	gg "github.com/fogleman/gg"
-	//"gg"
 )
 
 const ALPHA = 180
 
+// introduire différents type de population
+
 func main(){
+		// regrouper monde comme tableau de Flock
 		var monde []*Boid
+		//var monde2 []*Boid
 		// ----- init monde.boids ------ //
 		for i:=0 ; i<10; i++{
-			boid := NewBoid(i,[2]float64{100 + 20*rand.Float64(),200 + 35*rand.Float64()})
+			x := -1.0 + rand.Float64()*2
+			y := -1.0 + rand.Float64()*2
+			boid := NewBoid(i,[2]float64{500+20*x,500+20*y}, 1) // 20 c'est le rayon du flock ici ! 
 			monde = append(monde, &boid)
 		}
 		// --- life ---- //
@@ -32,14 +37,13 @@ func main(){
 								dc := gg.NewContext(1000, 1000)
 								// ici on actualise tout
 								for _,boid := range(monde){
-									boid.Update(monde)
+									boid.GetCouches(monde)
+                  boid.flock()
 								}
-								for _, boid:= range(monde){
-									//boid.CheckPosition(1000.0, 1000.0)
-									boid.Draw(dc)
-									boid.CheckSpeed()
-									boid.Update_pos(1000.0, 1000.0)
-									//fmt.Println(boid.vitesse) // créer une structure contenant tous les boids ? -> utile pour les tests et les stats.
+								for _, boid := range(monde){
+                  boid.Update()
+									boid.Border(1000.0,1000.0)
+                  boid.Draw(dc)
 								}
 								img := fmt.Sprintf("out_n%v.png",c)
 								dc.Fill()
@@ -49,12 +53,10 @@ func main(){
 	        }
 				}
 	    }()
-		//
-	  time.Sleep(10000 * time.Millisecond)
+	  time.Sleep(40000 * time.Millisecond)
 	  ticker.Stop()
 		done <- true
 		fmt.Println("Ticker stopped")
-
 }
 
 type Boid struct {
@@ -69,128 +71,120 @@ type Boid struct {
   max_force float64
   max_speed [2]float64
 	separation map[*Boid]bool
-	cohesion map[*Boid]bool
+	Cohesion map[*Boid]bool
 	alignement map[*Boid]bool
 	couleur int
 }
 
-func NewBoid(id int, position [2]float64) Boid{
+func NewBoid(id int, position [2]float64, couleur int) Boid{
   return Boid{
 		id,
     position,
-    [2]float64{1.0,1.0},
-    [2]float64{2.0,3.0},
-    20,
-		5,
-		10,
+    [2]float64{1.5,1.0},
+    [2]float64{0.0,0.0},
+    5,
 		20,
+		30,
+		33,
 		10,
-    [2]float64{15.0,15.0},
+    [2]float64{10.0,10.0},
 		make(map[*Boid]bool),
 		make(map[*Boid]bool),
 		make(map[*Boid]bool),
-		1,
+		couleur,
   }
 }
 
-/*
-func (b *Boid) CheckPosition(width float64, height float64){
-	fmt.Println(b.position)
-	if b.position[0] < 0.0{
-		b.position[0] = width
-	}
-	if b.position[0] > width{
-		b.position[0] = 0.0
-	}
-	if b.position[1] < 0.0{
-		b.position[0] = height
-	}
-	if b.position[1] > height{
-		b.position[1] = 0.0
-	}
-	fmt.Println(b.position)
-}
-*/
-func (b *Boid) CheckSpeed(){
-	// tod:  plutot checker la norme du vecteur
-	if b.vitesse[0] > b.max_speed[0]{
-		b.vitesse[0] = 5
-	}
-	if b.vitesse[1] > b.max_speed[1]{
-		b.vitesse[1] = 5
-	}
-}
-func (b * Boid) UpdateSpeed(boids map[*Boid]bool){
-	// couche alignement
-	var avg_speed [2]float64
-	for boid,_ := range(boids){
-		avg_speed[0] = avg_speed[0] + boid.vitesse[0]
-		avg_speed[1] = avg_speed[1] + boid.vitesse[1]
-	}
-	if len(boids) != 0{
-	b.vitesse[0] += avg_speed[0]/float64(len(boids))
-	b.vitesse[1] += avg_speed[1]/float64(len(boids))
-}
+// ne fonctionne pas. -> repenser l'espace (tore ?)
+func (b *Boid) Border(width float64, height float64){
+  if (b.position[0] < -b.longueur){
+    b.position[0] = width - b.longueur
+  }
+  if (b.position[0] > width + b.longueur ){
+    b.position[0] = b.longueur
+  }
+  if (b.position[1] < -b.longueur){
+    b.position[1] = height - b.longueur
+  }
+  if (b.position[1] > height + b.longueur){
+    b.position[1] = b.longueur
+  }
 }
 
-func (b *Boid) UpdateSeparation(boids map[*Boid]bool){
-	delta_x := 0.0
-	delta_y := 0.0
-	for boid,_ := range(boids){
-		delta_x = delta_x - boid.position[0]
-		delta_y = delta_y - boid.position[1]
-	}
-	if len(boids) != 0 {
-	b.vitesse[0] += delta_x/float64(len(boids))
-	b.vitesse[1] += delta_y/float64(len(boids))
-}
-}
-
-func (b *Boid) UpdateCohesion(boids map[*Boid]bool){
-	delta_x := 0.0
-	delta_y := 0.0
-	for boid,_ := range(boids){
-		delta_x = delta_x + boid.position[0]
-		delta_y = delta_y + boid.position[1]
-	}
-	if len(boids) != 0{
-		b.vitesse[0] += delta_x/float64(len(boids))
-		b.vitesse[1] += delta_y/float64(len(boids))
+func (b *Boid) limit(){
+	// regarder la norme plutot
+	norme := math.Sqrt(math.Pow(b.vitesse[0],2) + math.Pow(b.vitesse[1],2))
+	norme_max := math.Sqrt(math.Pow(b.max_speed[0],2) + math.Pow(b.max_speed[1],2))
+  if norme >= norme_max{
+		b.vitesse[0] = 1.0 + 2*rand.Float64()
+		b.vitesse[1] = 1.0 + 2*rand.Float64()
 	}
 }
 
-func (b *Boid) Update(boids []*Boid){
-	b.GetCouches(boids)
-	b.UpdateSeparation(b.separation)
-	b.UpdateCohesion(b.cohesion)
-	b.UpdateSpeed(b.alignement)
+func (b *Boid) Update(){
+	b.vitesse[0] += b.acceleration[0]
+  b.vitesse[1] += b.acceleration[1]
+  b.limit()
+  b.position[0] += b.vitesse[0]
+  b.position[1] += b.vitesse[1]
+  b.acceleration = [2]float64{0.0,0.0}
 }
 
-func (b *Boid) Update_pos(width float64, height float64){
-	nouvelle_pos_x := b.position[0] + b.vitesse[0]
-	nouvelle_pos_y := b.position[1] + b.vitesse[1]
-	update := false
-	if nouvelle_pos_x < 0{
-		b.position[0] = width + (b.vitesse[0] + b.position[0]) //  b.vitesse[0] negatif mais plus grand en va que b.position(0)
-		update = true
-	}
-	if nouvelle_pos_x > width{
-		b.position[0] =  (b.vitesse[0] + (width - b.position[0])) //  b.vitesse[0] negatif mais plus grand en va que b.position(0)
-		update =true
-	}
-	if nouvelle_pos_y < 0{
-		b.position[0] = height + (b.vitesse[0] + b.position[0]) //  b.vitesse[0] negatif mais plus grand en va que b.position(0)
-		update =true
-	}
-	if nouvelle_pos_y > height{
-		b.position[0] =  (b.vitesse[0] + (height - b.position[0])) //  b.vitesse[0] negatif mais plus grand en va que b.position(0)
-		update =true
-	}
-	if !(update){
-		b.position[0] += b.vitesse[0] // pas de temps de 1 (d = vt)
-		b.position[1] += b.vitesse[1]
-	}
+func (b *Boid) ApplyForce(force [2]float64){
+  b.acceleration[0] += force[0]
+  b.acceleration[1] += force[1]
 }
+
+func (b *Boid) flock(){
+  sep := b.separate()
+  ali := b.align()
+  coh := b.cohesion()
+  b.ApplyForce(sep)
+  b.ApplyForce(ali)
+  b.ApplyForce(coh)
+}
+
+func (b *Boid) separate() (t [2]float64){
+  steer := [2]float64{0.0,0.0}
+  for boid,_ := range(b.separation){
+    steer[0] = steer[0] - boid.position[0]
+    steer[1] = steer[1] - boid.position[1]
+  }
+  if len(b.separation) != 0 {
+    steer[0] = steer[0]/float64(len(b.separation))
+    steer[1] = steer[1]/float64(len(b.separation))
+  }
+	steer[0] -= b.vitesse[0]
+	steer[1] -= b.vitesse[1]
+  return steer
+}
+
+func (b *Boid) align() (t [2]float64){
+  alignement := [2]float64{0.0, 0.0}
+	for boid,_ := range(b.alignement){
+		alignement[0] = alignement[0] + boid.vitesse[0]
+		alignement[1] = alignement[1] + boid.vitesse[1]
+	}
+	if len(b.alignement) != 0{
+  alignement[0] = alignement[0]/float64(len(b.alignement))
+	alignement[1] = alignement[1]/float64(len(b.alignement))
+}
+  return alignement
+}
+
+func (b *Boid) cohesion() (t [2]float64){
+  cohesion := [2]float64{0.0, 0.0}
+	for boid,_ := range(b.Cohesion){
+		cohesion[0] = cohesion[0] + boid.position[0]
+		cohesion[1] = cohesion[1] + boid.position[1]
+	}
+	if len(b.Cohesion) != 0{
+		cohesion[0] = cohesion[0]/float64(len(b.Cohesion))
+		cohesion[1] = cohesion[1]/float64(len(b.Cohesion))
+	}
+  return cohesion
+}
+
 
 func (b *Boid) GetCouches(boids []*Boid){
 	// Couche separation, cohesion, alignement
@@ -202,14 +196,14 @@ func (b *Boid) GetCouches(boids []*Boid){
 		if distance <= b.rayonSeparation{
 				b.separation[boid] = true
 				b.alignement[boid] = true
-				b.cohesion[boid] = true
+				b.Cohesion[boid] = true
 				//separation = append(separation, boid) // map plutot que tableau
 			}else if (distance > b.rayonSeparation && distance <= b.rayonVitesse){
 				b.alignement[boid] = true
-				b.cohesion[boid] = true
+				b.Cohesion[boid] = true
 				//alignement = append(alignement, boid)
 			}else if (distance > b.rayonVitesse && distance <= b.rayonCohesion){
-				b.cohesion[boid] = true
+				b.Cohesion[boid] = true
 				//cohesion = append(cohesion, boid)
 			}
 	}
@@ -226,7 +220,7 @@ func (b *Boid) Draw(dc *gg.Context ){
 	case 4:
 		dc.SetRGB(100, 400, 50)
 	case 0:
-			dc.SetRGB(500,500,300)
+	   dc.SetRGB(500,500,300)
 	}
 	dc.DrawCircle(b.position[0],b.position[1], b.longueur)
 	dc.Fill()
