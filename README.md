@@ -1,23 +1,32 @@
 # projet_IA04
 
-### Systemes emergents, changement de comportement locaux conditionné par la musique
+## Participants
+
+LECLERCQ Vivien
+SOTO Louis 
+CONSTANTIN Alexandre 
+DESCAMPS Jean
+
+### Comportements émergents et modélisation de la dynamique d'un ecosysteme
 
 #### Enjeux 
 
 - Rendu artistique 
 
-Impacts des perturbations locales sur l'etat global 
- - categorisation des etats globaux : stable, instable, metastable 
- - heterogeneité des agents 
- - 
- -
- 
+- Comprendre les méchanismes régissants la dynamique d'un ecosysteme. 
+
+L'utilisation de la musique nous parait intéressante par l'information riche qu'elle procure. 
+
+Dans le cas de l'application à Boid, les questions auxquelles nous souhaitons répondre à travers cette simulation sont les suivantes : 
+
+- Sous quelles conditions le système est-il stable ? 
+- Existe-t-il une hétérogénité dans les sous-populations qui survivent ? 
 
 
-### Implementation de différents systemes 
+Nous divergeons pour le moment encore sur le choix de base pour l'implémentation (boids ou slime), les deux projets s'influencent mutuellement pour le moment.
 
-#### Primordial particle systems
-
-#### Boids
+#### Boids 
+https://fr.wikipedia.org/wiki/Boids
 
 #### Slime
+https://uwe-repository.worktribe.com/output/980579
