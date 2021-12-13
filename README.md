@@ -31,3 +31,20 @@ https://fr.wikipedia.org/wiki/Boids
 
 #### Slime
 https://uwe-repository.worktribe.com/output/980579
+
+## Architecture du projet 
+
+### Modules 
+
+- modélisation des agents (agents boids, agents perturbateurs)
+- modélisation du monde (runtime) -> Game 
+- rendu graphique 
+- analyse (macro, statistique)
+
+### Etapes 
+
+- Reproduire Boid tel quel (fait) ->   
+- refactoriser le code 
+- varier les 3 forces -> voir ce qu'on obtient (equilibre ?) 
+- injecter les agents perturbateurs -> étager le comportement -> quel comportement/quel ratio d'agents pour les equilibres qu'on a vu au dessus. 
+- Analyse 
