@@ -48,3 +48,10 @@ https://uwe-repository.worktribe.com/output/980579
 - varier les 3 forces -> voir ce qu'on obtient (equilibre ?) 
 - injecter les agents perturbateurs -> étager le comportement -> quel comportement/quel ratio d'agents pour les equilibres qu'on a vu au dessus. 
 - Analyse 
+
+### A faire 
+
+-refactorisation du code Vivien
+- gerer les effets de bord 
+- modélisation des états du boid pour tous les ratios de force possible 
+
