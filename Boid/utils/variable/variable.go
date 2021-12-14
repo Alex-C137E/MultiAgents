@@ -5,6 +5,9 @@ import (
 )
 
 var (
-	BirdImage *ebiten.Image
-	WallImage *ebiten.Image
+	BirdImage                  *ebiten.Image
+	WallImage                  *ebiten.Image
+	RepulsionFactorBtwnSpecies float64
+	SeparationPerception       float64
+	CohesionPerception         float64
 )
