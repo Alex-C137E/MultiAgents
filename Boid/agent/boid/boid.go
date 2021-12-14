@@ -3,6 +3,7 @@ package boid
 import (
 	wall "gitlab.utc.fr/projet_ia04/Boid/agent/wall"
 	constant "gitlab.utc.fr/projet_ia04/Boid/utils/constant"
+	variable "gitlab.utc.fr/projet_ia04/Boid/utils/variable"
 	vector "gitlab.utc.fr/projet_ia04/Boid/utils/vector"
 )
 
@@ -32,18 +33,18 @@ func (boid *Boid) ApplyRules(restOfFlock []*Boid) {
 				alignTotal++
 				alignSteering.Add(other.Velocity)
 			}
-			if boid.Species == other.Species && d < constant.CohesionPerception {
+			if boid.Species == other.Species && d < variable.CohesionPerception {
 				cohesionTotal++
 				cohesionSteering.Add(other.Position)
 			}
-			if d < constant.SeparationPerception {
+			if d < variable.SeparationPerception {
 				separationTotal++
 				diff := boid.Position
 				diff.Subtract(other.Position)
 				diff.Divide(d)
 				separationSteering.Add(diff)
 				if other.Species != boid.Species {
-					diff.Divide(d * constant.RepulsionFactorBtwnSpecies)
+					diff.Divide(d * variable.RepulsionFactorBtwnSpecies)
 					separationSteering.Add(diff)
 				}
 			}
