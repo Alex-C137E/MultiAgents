@@ -10,7 +10,7 @@ const (
 	AlignPerception            = 75.0
 	CohesionPerception         = 300.0
 	SeparationPerception       = 50.0
-	WallSeparationPerception   = 75.0
+	WallSeparationPerception   = 25.0 //increase it and a wall will looks like a repulsive object
 	NumSpecies                 = 3
 	RepulsionFactorBtwnSpecies = 100
 )
