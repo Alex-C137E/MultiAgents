@@ -19,14 +19,15 @@ import (
 type Vector2D = vector.Vector2D
 
 type Game struct {
-	Flock  flock.Flock
-	Inited bool
+	Flock flock.Flock
+	// Inited    bool
+	Sync      chan string
+	musicInfo string
 }
 
-func (g *Game) init() {
-	defer func() {
-		g.Inited = true
-	}()
+func NewGame(c chan string) *Game {
+	g := &Game{}
+	g.Sync = c
 
 	rand.Seed(time.Hour.Milliseconds())
 	g.Flock.Boids = make([]*boid.Boid, constant.NumBoids)
@@ -55,11 +56,43 @@ func (g *Game) init() {
 			Position:    Vector2D{X: x, Y: y},
 		}
 	}
+	// Variable Initialisations
+	variable.RepulsionFactorBtwnSpecies = 100
+	variable.SeparationPerception = 50
+	variable.CohesionPerception = 300
+
+	go func() {
+		for {
+			// lorsque l'agent  reçoit sur sa channel sync(bloquant): il reçoit une indication de la musique
+			g.musicInfo = <-g.Sync
+			// Il doit modifier un de ses paramêtre
+		}
+	}()
+
+	return g
 }
 
 func (g *Game) Update(screen *ebiten.Image) error {
-	if !g.Inited {
-		g.init()
+	if g.musicInfo == "very hard drop" {
+		variable.RepulsionFactorBtwnSpecies = 500
+		variable.SeparationPerception = 250
+		variable.CohesionPerception = 100
+	} else if g.musicInfo == "hard drop" {
+		variable.RepulsionFactorBtwnSpecies = 400
+		variable.SeparationPerception = 200
+		variable.CohesionPerception = 150
+	} else if g.musicInfo == "medium drop" {
+		variable.RepulsionFactorBtwnSpecies = 300
+		variable.SeparationPerception = 150
+		variable.CohesionPerception = 200
+	} else if g.musicInfo == "small drop" {
+		variable.RepulsionFactorBtwnSpecies = 200
+		variable.SeparationPerception = 100
+		variable.CohesionPerception = 250
+	} else {
+		variable.RepulsionFactorBtwnSpecies = 100
+		variable.SeparationPerception = 50
+		variable.CohesionPerception = 300
 	}
 
 	g.Flock.Logic()
