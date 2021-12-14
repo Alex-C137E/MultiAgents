@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
+	music "gitlab.utc.fr/projet_ia04/Boid/agent/music"
 	game "gitlab.utc.fr/projet_ia04/Boid/game"
 	constant "gitlab.utc.fr/projet_ia04/Boid/utils/constant"
 	variable "gitlab.utc.fr/projet_ia04/Boid/utils/variable"
@@ -23,9 +24,14 @@ func init() {
 }
 
 func main() {
+	// création de la chanel de sync pour la music:
+	c := make(chan string)
+	musicAgent := music.NewMusicAgent("utils/music/virtual-riot-the-darkest-night.mp3", "utils/music/virtual-riot-the-darkest-night.wav", c)
+	musicAgent.Start()
+
 	ebiten.SetWindowSize(constant.ScreenWidth, constant.ScreenHeight)
 	ebiten.SetWindowTitle("Boids")
-	if err := ebiten.RunGame(&game.Game{}); err != nil {
+	if err := ebiten.RunGame(game.NewGame(c)); err != nil {
 		log.Fatal(err)
 	}
 }
