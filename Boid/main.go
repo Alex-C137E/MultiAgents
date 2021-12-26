@@ -48,6 +48,14 @@ func init() {
 	variable.FishImage3 = ebiten.NewImage(w, h)
 	variable.FishImage3.DrawImage(fish3, op)
 
+	preda, _, err := ebitenutil.NewImageFromFile("utils/fish/predT3.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	w, h = fish1.Size()
+	variable.PredImage = ebiten.NewImage(w+100, h+100)
+	variable.PredImage.DrawImage(preda, op)
+
 	back, _, err := ebitenutil.NewImageFromFile("utils/fish/background.png")
 	if err != nil {
 		log.Fatal(err)

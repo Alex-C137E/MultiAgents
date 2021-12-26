@@ -2,12 +2,14 @@ package flock
 
 import (
 	boid "gitlab.utc.fr/projet_ia04/Boid/agent/boid"
+	predator "gitlab.utc.fr/projet_ia04/Boid/agent/predator"
 	wall "gitlab.utc.fr/projet_ia04/Boid/agent/wall"
 )
 
 type Flock struct {
-	Boids []*boid.Boid
-	Walls []*wall.Wall
+	Boids     []*boid.Boid
+	Walls     []*wall.Wall
+	Predators []*predator.Predator
 }
 
 func (flock *Flock) Logic() {
@@ -18,5 +20,12 @@ func (flock *Flock) Logic() {
 			}
 		}
 		boid.ApplyMovement()
+	}
+	for _, preda := range flock.Predators {
+		if !preda.CheckEdges() {
+			preda.ApplyRules(flock.Boids)
+			preda.CheckWalls(flock.Walls)
+		}
+		preda.ApplyMovement()
 	}
 }

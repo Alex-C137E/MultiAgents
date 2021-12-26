@@ -9,6 +9,7 @@ var (
 	FishImage1                 *ebiten.Image
 	FishImage2                 *ebiten.Image
 	FishImage3                 *ebiten.Image
+	PredImage                  *ebiten.Image
 	BackgroundImage            *ebiten.Image
 	WallImage                  *ebiten.Image
 	RepulsionFactorBtwnSpecies float64

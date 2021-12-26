@@ -3,8 +3,9 @@ package constant
 const (
 	ScreenWidth              = 1152
 	ScreenHeight             = 648
-	NumBoids                 = 200
-	NumWalls                 = 20
+	NumBoids                 = 300
+	NumPreda                 = 3
+	NumWalls                 = 30
 	MaxForce                 = 2.0
 	MaxSpeed                 = 4.0
 	AlignPerception          = 75.0

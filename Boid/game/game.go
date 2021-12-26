@@ -18,6 +18,7 @@ import (
 	"golang.org/x/image/font"
 
 	boid "gitlab.utc.fr/projet_ia04/Boid/agent/boid"
+	predator "gitlab.utc.fr/projet_ia04/Boid/agent/predator"
 	wall "gitlab.utc.fr/projet_ia04/Boid/agent/wall"
 	flock "gitlab.utc.fr/projet_ia04/Boid/flock"
 	constant "gitlab.utc.fr/projet_ia04/Boid/utils/constant"
@@ -53,6 +54,8 @@ func NewGame(c chan string) *Game {
 	rand.Seed(time.Hour.Milliseconds())
 	g.Flock.Boids = make([]*boid.Boid, constant.NumBoids)
 	g.Flock.Walls = make([]*wall.Wall, constant.NumWalls)
+	g.Flock.Predators = make([]*predator.Predator, constant.NumPreda)
+
 	for i := range g.Flock.Boids {
 		w, h := variable.BirdImage.Size()
 		x, y := rand.Float64()*float64(constant.ScreenWidth-w), rand.Float64()*float64(constant.ScreenWidth-h)
@@ -76,6 +79,25 @@ func NewGame(c chan string) *Game {
 			ImageWidth:  w,
 			ImageHeight: h,
 			Position:    Vector2D{X: x, Y: y},
+		}
+	}
+	for i := range g.Flock.Predators {
+		w, h := variable.BirdImage.Size()
+		x, y := rand.Float64()*float64(constant.ScreenWidth-w), rand.Float64()*float64(constant.ScreenWidth-h)
+		min, max := -constant.MaxForce, constant.MaxForce
+		vx, vy := rand.Float64()*(max-min)+min, rand.Float64()*(max-min)+min
+		g.Flock.Predators[i] = &predator.Predator{
+			ImageWidth:   w,
+			ImageHeight:  h,
+			Position:     Vector2D{X: x, Y: y},
+			Velocity:     Vector2D{X: vx, Y: vy},
+			Acceleration: Vector2D{X: 0, Y: 0},
+			Density:      5,
+			Dist:         400,
+			Angle:        10,
+			V1:           Vector2D{X: 0, Y: 0},
+			V2:           Vector2D{X: 0, Y: 0},
+			R:            false,
 		}
 	}
 	// Variable Initialisations
@@ -188,6 +210,25 @@ func (g *Game) Draw(screen *ebiten.Image) {
 				screen.DrawImage(variable.FishImage3, &op)
 			}
 		}
+	}
+
+	for _, preda := range g.Flock.Predators {
+		op.GeoM.Reset()
+		op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		op.GeoM.Rotate(-1*math.Atan2(preda.Velocity.Y*-1, preda.Velocity.X) + math.Pi)
+		op.GeoM.Translate(preda.Position.X, preda.Position.Y)
+
+		screen.DrawImage(variable.PredImage, &op)
+
+		op.GeoM.Reset()
+		//op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		op.GeoM.Translate(preda.V2.X, preda.V2.Y)
+		screen.DrawImage(variable.BirdImage, &op)
+
+		op.GeoM.Reset()
+		//op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		op.GeoM.Translate(preda.V1.X, preda.V1.Y)
+		screen.DrawImage(variable.BirdImage, &op)
 	}
 	w, h = variable.WallImage.Size()
 	for _, wall := range g.Flock.Walls {
