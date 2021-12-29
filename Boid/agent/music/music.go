@@ -82,6 +82,7 @@ func (musicAgent *MusicAgent) Start() {
 				if quit {
 					esc = true
 				}
+
 				if changed {
 					screen.Clear()
 					ap.draw(screen)
@@ -98,6 +99,7 @@ func (musicAgent *MusicAgent) Start() {
 				sr := ap.streamer.Position()
 				amplitude := ap.samples[sr]
 				speaker.Unlock()
+
 				if amplitude > 0.5 {
 					ap.sync <- "very hard drop"
 				} else if amplitude > 0.3 {
@@ -138,11 +140,11 @@ type audioPanel struct {
 	sync       chan string
 }
 
-func newAudioPanel(sampleRate beep.SampleRate, streamer beep.StreamSeeker, samples []pkg.Frame, c chan string) *audioPanel {
+func newAudioPanel(sampleRate beep.SampleRate, streamer beep.StreamSeeker, samples []pkg.Frame, c1 chan string) *audioPanel {
 	ctrl := &beep.Ctrl{Streamer: beep.Loop(-1, streamer)}
 	resampler := beep.ResampleRatio(4, 1, ctrl)
 	volume := &effects.Volume{Streamer: resampler, Base: 2}
-	return &audioPanel{sampleRate, streamer, ctrl, resampler, volume, samples, c}
+	return &audioPanel{sampleRate, streamer, ctrl, resampler, volume, samples, c1}
 }
 
 func (ap *audioPanel) play() {
@@ -210,7 +212,6 @@ func (ap *audioPanel) handle(event tcell.Event) (changed, quit bool) {
 	switch event := event.(type) {
 	case *tcell.EventKey:
 		if event.Key() == tcell.KeyESC {
-			// panic("esc")
 			return false, true
 		}
 
@@ -267,6 +268,39 @@ func (ap *audioPanel) handle(event tcell.Event) (changed, quit bool) {
 		case 'x':
 			speaker.Lock()
 			ap.resampler.SetRatio(ap.resampler.Ratio() * 16 / 15)
+			speaker.Unlock()
+			return true, false
+
+		// raccourcis secret par la channel de la musique:
+		case 'l':
+			// commenter lock/unlock si on ne veux pas que la musique s'arrete
+			speaker.Lock()
+			ap.sync <- "1"
+			time.Sleep((1 * time.Second))
+			speaker.Unlock()
+			return true, false
+		case 'o':
+			speaker.Lock()
+			ap.sync <- "2"
+			time.Sleep((1 * time.Second))
+			speaker.Unlock()
+			return true, false
+		case 'u':
+			speaker.Lock()
+			ap.sync <- "3"
+			time.Sleep((1 * time.Second))
+			speaker.Unlock()
+			return true, false
+		case 'i':
+			speaker.Lock()
+			ap.sync <- "4"
+			time.Sleep((1 * time.Second))
+			speaker.Unlock()
+			return true, false
+		case 'j':
+			speaker.Lock()
+			ap.sync <- "5"
+			time.Sleep((1 * time.Second))
 			speaker.Unlock()
 			return true, false
 		}
