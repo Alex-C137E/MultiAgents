@@ -6,8 +6,8 @@ type Score struct {
 	RequiredFishType int
 }
 
-func NewScore(level int, requiredFishType int) *Score {
-	return &Score{level, 0, requiredFishType}
+func NewScore(level int, currentScore int, requiredFishType int) *Score {
+	return &Score{level, currentScore, requiredFishType}
 }
 
 func (s *Score) AddCollectedFish(fishType int) {
