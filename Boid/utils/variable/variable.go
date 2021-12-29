@@ -15,4 +15,8 @@ var (
 	RepulsionFactorBtwnSpecies float64
 	SeparationPerception       float64
 	CohesionPerception         float64
+	AlignPerception            float64
+	MaxForce                   float64
+	MaxSpeed                   float64
+	NumWall                    int
 )
