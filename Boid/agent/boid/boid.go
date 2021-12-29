@@ -31,7 +31,7 @@ func (boid *Boid) ApplyRules(restOfFlock []*Boid) {
 		for _, other := range restOfFlock {
 			d := boid.Position.Distance(other.Position)
 			if boid != other {
-				if boid.Species == other.Species && d < constant.AlignPerception {
+				if boid.Species == other.Species && d < variable.AlignPerception {
 					alignTotal++
 					alignSteering.Add(other.Velocity)
 				}
@@ -55,22 +55,22 @@ func (boid *Boid) ApplyRules(restOfFlock []*Boid) {
 
 		if separationTotal > 0 {
 			separationSteering.Divide(float64(separationTotal))
-			separationSteering.SetMagnitude(constant.MaxSpeed)
+			separationSteering.SetMagnitude(variable.MaxSpeed)
 			separationSteering.Subtract(boid.Velocity)
-			separationSteering.SetMagnitude(constant.MaxForce * 1.2)
+			separationSteering.SetMagnitude(variable.MaxForce * 1.2)
 		}
 		if cohesionTotal > 0 {
 			cohesionSteering.Divide(float64(cohesionTotal))
 			cohesionSteering.Subtract(boid.Position)
-			cohesionSteering.SetMagnitude(constant.MaxSpeed)
+			cohesionSteering.SetMagnitude(variable.MaxSpeed)
 			cohesionSteering.Subtract(boid.Velocity)
-			cohesionSteering.SetMagnitude(constant.MaxForce * 0.9)
+			cohesionSteering.SetMagnitude(variable.MaxForce * 0.9)
 		}
 		if alignTotal > 0 {
 			alignSteering.Divide(float64(alignTotal))
-			alignSteering.SetMagnitude(constant.MaxSpeed)
+			alignSteering.SetMagnitude(variable.MaxSpeed)
 			alignSteering.Subtract(boid.Velocity)
-			alignSteering.Limit(constant.MaxForce)
+			alignSteering.Limit(variable.MaxForce)
 		}
 
 		boid.Acceleration.Add(alignSteering)
@@ -84,7 +84,7 @@ func (boid *Boid) ApplyMovement() {
 	if !boid.Dead {
 		boid.Position.Add(boid.Velocity)
 		boid.Velocity.Add(boid.Acceleration)
-		boid.Velocity.Limit(constant.MaxSpeed)
+		boid.Velocity.Limit(variable.MaxSpeed)
 		boid.Acceleration.Multiply(0.0)
 	}
 }
@@ -169,9 +169,9 @@ func (boid *Boid) CheckWalls(walls []*wall.Wall) bool {
 	}
 	if separationTotal > 0 {
 		separationSteering.Divide(float64(separationTotal))
-		separationSteering.SetMagnitude(constant.MaxSpeed)
+		separationSteering.SetMagnitude(variable.MaxSpeed)
 		separationSteering.Subtract(boid.Velocity)
-		separationSteering.SetMagnitude(constant.MaxForce * 1.2)
+		separationSteering.SetMagnitude(variable.MaxForce * 1.2)
 		boid.Acceleration.Add(separationSteering)
 		return true
 	}
