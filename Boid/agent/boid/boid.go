@@ -13,15 +13,15 @@ import (
 type Vector2D = vector.Vector2D
 
 type Boid struct {
-	ImageWidth   int
-	ImageHeight  int
-	Position     Vector2D
-	Velocity     Vector2D
-	Acceleration Vector2D
-	Species      int
-	Dead         bool
+	ImageWidth     int
+	ImageHeight    int
+	Position       Vector2D
+	Velocity       Vector2D
+	Acceleration   Vector2D
+	Species        int
+	Dead           bool
 	EscapePredator float64
-	Marqued  bool
+	Marqued        bool
 }
 
 type Predator struct {
@@ -49,75 +49,75 @@ func (boid *Boid) ApplyRules(restOfFlock []*Boid, predators []*Predator) {
 
 		istherepred := false
 		// check predator presence
-		if boid.Marqued{
-			if boid.Species ==3{
+		if boid.Marqued {
+			if boid.Species == 3 {
 				goback := boid.Velocity
-				goback.Multiply(2.5*3.0)
+				goback.Multiply(2.5 * 3.0)
 				boid.Acceleration.Add(goback)
 			}
-			if boid.Species ==4{
+			if boid.Species == 4 {
 				goback := vector.Rotate(boid.Velocity, int(rand.Float64()*360))
-				goback.Multiply(2.5*3.0)
+				goback.Multiply(2.5 * 3.0)
 				boid.Acceleration.Add(goback)
 			}
 			boid.Marqued = false
 			return
 		}
 
-		for _, pred := range predators{
+		for _, pred := range predators {
 			d := boid.Position.Distance(pred.Position)
 			if d < boid.EscapePredator {
 				istherepred = true
 				// 180 retour espece 1
-				if boid.Species == 1{
-					goback := boid.Velocity// on divise par 3 à la fin de la fonction
-					goback.Multiply(2.5*3.0)
+				if boid.Species == 1 {
+					goback := boid.Velocity // on divise par 3 à la fin de la fonction
+					goback.Multiply(2.5 * 3.0)
 					boid.Acceleration.Add(goback)
 				}
-				if boid.Species == 2{
+				if boid.Species == 2 {
 					// eclatement de la population, orientation aleatoire
 					goback := vector.Rotate(boid.Velocity, int(rand.Float64()*360))
-					goback.Multiply(2.5*3.0)
+					goback.Multiply(2.5 * 3.0)
 					boid.Acceleration.Add(goback)
 				}
-				if boid.Species == 3 || boid.Species == 4{
+				if boid.Species == 3 || boid.Species == 4 {
 					// Le boid alerte tous ses voisins qui partent dans une direction donnée si il n'est pas marqué
 					for _, other := range restOfFlock {
 						d := boid.Position.Distance(other.Position)
 						if d < variable.SeparationPerception {
 							other.Marqued = true
-			 }
-			}
-		}
-	 }
-	}
-
-		if !(istherepred){
-		for _, other := range restOfFlock {
-			d := boid.Position.Distance(other.Position)
-			if boid != other {
-				if boid.Species == other.Species && d < variable.AlignPerception {
-					alignTotal++
-					alignSteering.Add(other.Velocity)
-				}
-				if boid.Species == other.Species && d < variable.CohesionPerception {
-					cohesionTotal++
-					cohesionSteering.Add(other.Position)
-				}
-				if d < variable.SeparationPerception {
-					separationTotal++
-					diff := boid.Position
-					diff.Subtract(other.Position)
-					diff.Divide(d)
-					separationSteering.Add(diff)
-					if other.Species != boid.Species {
-						diff.Divide(d * variable.RepulsionFactorBtwnSpecies)
-						separationSteering.Add(diff)
+						}
 					}
 				}
 			}
 		}
-	}
+
+		if !(istherepred) {
+			for _, other := range restOfFlock {
+				d := boid.Position.Distance(other.Position)
+				if boid != other {
+					if boid.Species == other.Species && d < variable.AlignPerception {
+						alignTotal++
+						alignSteering.Add(other.Velocity)
+					}
+					if boid.Species == other.Species && d < variable.CohesionPerception {
+						cohesionTotal++
+						cohesionSteering.Add(other.Position)
+					}
+					if d < variable.SeparationPerception {
+						separationTotal++
+						diff := boid.Position
+						diff.Subtract(other.Position)
+						diff.Divide(d)
+						separationSteering.Add(diff)
+						if other.Species != boid.Species {
+							diff.Divide(d * variable.RepulsionFactorBtwnSpecies)
+							separationSteering.Add(diff)
+						}
+					}
+				}
+			}
+		}
 
 		if separationTotal > 0 {
 			separationSteering.Divide(float64(separationTotal))
@@ -341,7 +341,7 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 	for _, Boid := range restOfFlock {
 		if !Boid.Dead {
 			dens = 0
-			b :=  vector.PointInTriangle(Boid.Position, preda.Position, vPoint[0], vPoint[1])
+			b := vector.PointInTriangle(Boid.Position, preda.Position, vPoint[0], vPoint[1])
 			b2 := false
 			if new {
 				b2 = vector.PointInTriangle(Boid.Position, newP.Position, vPoint2[0], vPoint2[1])
@@ -428,11 +428,12 @@ func (preda *Predator) CheckWalls(walls []*wall.Wall) {
 	} else {
 		for _, wall := range walls {
 			d := preda.Position.Distance(wall.Position)
-			if d <= 30 {
+			if d <= 20 {
 				preda.Velocity.Normalize()
-				preda.Velocity.X = -preda.Velocity.X * (30 - d + 1)
-				preda.Velocity.Y = -preda.Velocity.Y * (30 - d + 1)
+				preda.Velocity.X = -preda.Velocity.X * (100 - d + 1)
+				preda.Velocity.Y = -preda.Velocity.Y * (100 - d + 1)
 				preda.R = true
+				break
 			}
 		}
 	}
