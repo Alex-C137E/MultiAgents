@@ -18,7 +18,6 @@ import (
 	"golang.org/x/image/font"
 
 	boid "gitlab.utc.fr/projet_ia04/Boid/agent/boid"
-	"gitlab.utc.fr/projet_ia04/Boid/agent/predator"
 	wall "gitlab.utc.fr/projet_ia04/Boid/agent/wall"
 	flock "gitlab.utc.fr/projet_ia04/Boid/flock"
 	constant "gitlab.utc.fr/projet_ia04/Boid/utils/constant"
@@ -122,7 +121,7 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 	// Initialisation des agents:
 	rand.Seed(time.Hour.Milliseconds())
 	g.Flock.Boids = make([]*boid.Boid, constant.NumBoids)
-	g.Flock.Predators = make([]*predator.Predator, constant.NumPreda)
+	g.Flock.Predators = make([]*boid.Predator, constant.NumPreda)
 	g.Flock.Walls = make([]*wall.Wall, variable.NumWall)
 	for i := range g.Flock.Boids {
 		w, h := variable.FishImage1.Size()
@@ -138,6 +137,8 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 			Acceleration: Vector2D{X: 0, Y: 0},
 			Species:      s,
 			Dead:         false,
+			EscapePredator: 80.0,
+			Marqued: false,
 		}
 	}
 	for i := range g.Flock.Predators {
@@ -145,7 +146,7 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 		x, y := rand.Float64()*float64(constant.ScreenWidth-w), rand.Float64()*float64(constant.ScreenWidth-h)
 		min, max := -variable.MaxForce, variable.MaxForce
 		vx, vy := rand.Float64()*(max-min)+min, rand.Float64()*(max-min)+min
-		g.Flock.Predators[i] = &predator.Predator{
+		g.Flock.Predators[i] = &boid.Predator{
 			ImageWidth:   w,
 			ImageHeight:  h,
 			Position:     Vector2D{X: x, Y: y},
