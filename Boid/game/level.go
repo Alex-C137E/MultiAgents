@@ -9,6 +9,7 @@ type Level struct {
 	MaxForce                   float64
 	MaxSpeed                   float64
 	polygonSize                float64
+	SharkDensity               int
 }
 
 func NewLevel(RepulsionFactorBtwnSpecies float64,
@@ -18,7 +19,8 @@ func NewLevel(RepulsionFactorBtwnSpecies float64,
 	numWall int,
 	MaxForce float64,
 	MaxSpeed float64,
-	polgonSize float64) *Level {
+	polgonSize float64,
+	SharkDensity int) *Level {
 	return &Level{RepulsionFactorBtwnSpecies,
 		SeparationPerception,
 		CohesionPerception,
@@ -26,5 +28,6 @@ func NewLevel(RepulsionFactorBtwnSpecies float64,
 		numWall,
 		MaxForce,
 		MaxSpeed,
-		polgonSize}
+		polgonSize,
+		SharkDensity}
 }
