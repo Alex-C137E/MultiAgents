@@ -54,26 +54,35 @@ func NewGame(c chan string, timeOut int) *Game {
 	g.initTime = time.Now()
 	g.timeOut = timeOut
 
-	//Création de niveaux:
+	//Création de 5 niveaux:
 	g.levels = make([]*Level, 5)
+
+	// niveau 0
 	// niveau très simple dans lequel les poisons sont amené à se regroupé et se stabilisé rapidement
-	g.levels[0] = NewLevel(10000, 10, 300, 100, 16+10, 1, 4.0, 1000)
+	g.levels[0] = NewLevel(10000, 10, 300, 100, 16+10, 1, 4.0, 1000, 15)
 
-	// même typed de niveau que le 0, mais le regroupement prend plus de temps et la stabilité est moindre
-	// et le filet est plus petit
-	g.levels[1] = NewLevel(500, 100, 100, 75, 16+10, 2.0, 4.0, 700)
+	// niveau 1
+	// premier niveau mais cette fois-ci les requin attaquent bien plus, il faut don  être plus rapide
+	g.levels[1] = NewLevel(10000, 10, 300, 100, 16+10, 1, 4.0, 1000, 8)
 
+	// niveau 2
+	// même type de niveau que le 0, mais le regroupement prend plus de temps et la stabilité est moindre
+	// et le lasso est plus petit
+	g.levels[2] = NewLevel(500, 100, 100, 75, 16+10, 2.0, 4.0, 700, 8)
+
+	// niveau 3
 	// on dimunie le facteur de repulsion entre espèce ainsi que celui de cohésion
 	// pour rendre plus dificile le fait de n'attrapper
 	// qu'une espèce
-	g.levels[2] = NewLevel(50, 100, 50, 75, 16+10, 2.0, 4.0, 700)
+	// et bien sur on adapte les requins en diminuant leur parametre densité
+	g.levels[3] = NewLevel(50, 100, 75, 75, 16+10, 2.0, 4.0, 700, 5)
 
+	// niveau 4
 	// on rajoute des mures/bombes: ce qui favorise le chaos et rend plus dificile la tâche
-	// d'attraper les poisson
-	g.levels[3] = NewLevel(50, 100, 50, 75, 16+10+2*48, 2.0, 4.0, 700)
-
-	//niveau impossible
-	g.levels[4] = NewLevel(0, 0, 0, 0, 16+10+2*48, 5.0, 8.0, 700)
+	// d'attraper les poissons
+	// De plus les poissons sont moins en cohésion et vont plus vite
+	// en plus on améliore les requins :)
+	g.levels[4] = NewLevel(50, 100, 50, 75, 16+10+2*48, 2.0, 5.0, 700, 3)
 
 	go func() {
 		for {
@@ -125,25 +134,35 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 	g.Flock.Walls = make([]*wall.Wall, variable.NumWall)
 	for i := range g.Flock.Boids {
 		w, h := variable.FishImage1.Size()
-		x, y := rand.Float64()*float64(constant.ScreenWidth-w), rand.Float64()*float64(constant.ScreenWidth-h)
+
+		// Pour éviter que les agents apparaisent au dessus ou en dessous des murs de bombes:
+		// on les fait apparaitre  horizontalement en ligne au mileu  de l'écran:
+		middle := constant.ScreenHeight / 2
+		x, y := rand.Float64()*float64(constant.ScreenWidth-w), float64(middle)
+
 		min, max := -variable.MaxForce, variable.MaxForce
 		vx, vy := rand.Float64()*(max-min)+min, rand.Float64()*(max-min)+min
 		s := rand.Intn(constant.NumSpecies)
 		g.Flock.Boids[i] = &boid.Boid{
-			ImageWidth:   w,
-			ImageHeight:  h,
-			Position:     Vector2D{X: x, Y: y},
-			Velocity:     Vector2D{X: vx, Y: vy},
-			Acceleration: Vector2D{X: 0, Y: 0},
-			Species:      s,
-			Dead:         false,
+			ImageWidth:     w,
+			ImageHeight:    h,
+			Position:       Vector2D{X: x, Y: y},
+			Velocity:       Vector2D{X: vx, Y: vy},
+			Acceleration:   Vector2D{X: 0, Y: 0},
+			Species:        s,
+			Dead:           false,
 			EscapePredator: 80.0,
-			Marqued: false,
+			Marqued:        false,
 		}
 	}
 	for i := range g.Flock.Predators {
 		w, h := variable.BirdImage.Size()
-		x, y := rand.Float64()*float64(constant.ScreenWidth-w), rand.Float64()*float64(constant.ScreenWidth-h)
+
+		// Pour éviter que les agents apparaisent au dessus ou en dessous des murs de bombes:
+		// on les fait apparaitre  horizontalement en ligne au mileu  de l'écran:
+		middle := constant.ScreenHeight / 2
+		x, y := rand.Float64()*float64(constant.ScreenWidth-w), float64(middle)
+
 		min, max := -variable.MaxForce, variable.MaxForce
 		vx, vy := rand.Float64()*(max-min)+min, rand.Float64()*(max-min)+min
 		g.Flock.Predators[i] = &boid.Predator{
@@ -152,7 +171,7 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 			Position:     Vector2D{X: x, Y: y},
 			Velocity:     Vector2D{X: vx, Y: vy},
 			Acceleration: Vector2D{X: 0, Y: 0},
-			Density:      5,
+			Density:      g.levels[g.currentLevel].SharkDensity,
 			Dist:         400,
 			Angle:        10,
 			V1:           Vector2D{X: 0, Y: 0},
@@ -161,15 +180,15 @@ func (g *Game) setGame(currentLevel int, initScore int) {
 		}
 	}
 
-	// Mise en place des murs/bombe en fonction du niveau
+	// Mise en place des murs/bombes en fonction du niveau
 	wallIndex := 0
 	//bombe oeil droit:
-	wallIndex = g.eyeWallBomb(constant.ScreenWidth*0.35, constant.ScreenHeight*0.5, wallIndex)
+	wallIndex = g.eyeWallBomb(constant.ScreenWidth*0.5, constant.ScreenHeight*0.4, wallIndex)
 	// bombe bouche
-	wallIndex = g.mouthWallBomb(constant.ScreenWidth*0.25, constant.ScreenHeight*0.55, wallIndex)
+	wallIndex = g.mouthWallBomb(constant.ScreenWidth*0.4, constant.ScreenHeight*0.55, wallIndex)
 	//bombe oeil gauche:
-	wallIndex = g.eyeWallBomb(constant.ScreenWidth*0.25, constant.ScreenHeight*0.5, wallIndex)
-	if g.currentLevel > 2 {
+	wallIndex = g.eyeWallBomb(constant.ScreenWidth*0.4, constant.ScreenHeight*0.4, wallIndex)
+	if g.currentLevel > 3 {
 		//Toit de Bombe:
 		wallIndex = g.sideWallBomb(true, wallIndex)
 		//Sol de Bombe:
@@ -222,7 +241,7 @@ func (g *Game) Update() error {
 		variable.CohesionPerception = g.levels[g.currentLevel].CohesionPerception
 	}
 
-	g.Flock.Logic()
+	g.Flock.Logic(g.currentLevel)
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
