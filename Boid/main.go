@@ -30,6 +30,14 @@ func init() {
 	variable.WallImage = ebiten.NewImage(bombW, bombH)
 	variable.WallImage.DrawImage(bomb, op)
 
+	sand, _, err := ebitenutil.NewImageFromFile("utils/fish/sand2.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+	sW, sH := sand.Size()
+	variable.SandImage = ebiten.NewImage(sW, sH)
+	variable.SandImage.DrawImage(sand, op)
+
 	fish1, _, err := ebitenutil.NewImageFromFile("utils/fish/poisson-2.png")
 	if err != nil {
 		log.Fatal(err)

@@ -8,4 +8,5 @@ type Wall struct {
 	ImageWidth  int
 	ImageHeight int
 	Position    vector.Vector2D
+	TypeWall    int
 }

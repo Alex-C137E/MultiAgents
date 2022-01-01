@@ -212,11 +212,11 @@ func (boid *Boid) CheckEdges() bool {
 	} else if boid.Position.X > constant.ScreenWidth {
 		boid.Position.X = 0
 	}
-	if boid.Position.Y < 0 {
-		boid.Position.Y = constant.ScreenHeight
-	} else if boid.Position.Y > constant.ScreenHeight {
-		boid.Position.Y = 0
-	}
+	//if boid.Position.Y < 0 {
+	//	boid.Position.Y = constant.ScreenHeight
+	//} else if boid.Position.Y > constant.ScreenHeight {
+	//	boid.Position.Y = 0
+	//	}
 	return false
 }
 
@@ -292,7 +292,7 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 
 	//Tuer
 	for _, Boid := range restOfFlock {
-		if (preda.Position.Distance(Boid.Position)) < 15 {
+		if (preda.Position.Distance(Boid.Position)) < 10 {
 			Boid.Dead = true
 		}
 	}
@@ -308,32 +308,32 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 		} else if vPoint[0].X < 0 {
 			newP.Position.X = preda.Position.X + constant.ScreenWidth
 		}
-		if vPoint[0].Y > constant.ScreenHeight {
-			newP.Position.Y = preda.Position.Y - constant.ScreenHeight
-		} else if vPoint[0].Y < 0 {
-			newP.Position.Y = preda.Position.Y + constant.ScreenHeight
-		}
+		//if vPoint[0].Y > constant.ScreenHeight {
+		//newP.Position.Y = preda.Position.Y - constant.ScreenHeight
+		//} else if vPoint[0].Y < 0 {
+		//	newP.Position.Y = preda.Position.Y + constant.ScreenHeight
+		//}
 
 		if vPoint[1].X > constant.ScreenWidth {
 			newP.Position.X = preda.Position.X - constant.ScreenWidth
 		} else if vPoint[1].X < 0 {
 			newP.Position.X = preda.Position.X + constant.ScreenWidth
 		}
-		if vPoint[1].Y > constant.ScreenHeight {
-			newP.Position.Y = preda.Position.Y - constant.ScreenHeight
-		} else if vPoint[1].Y < 0 {
-			newP.Position.Y = preda.Position.Y + constant.ScreenHeight
-		}
+		//if vPoint[1].Y > constant.ScreenHeight {
+		//	newP.Position.Y = preda.Position.Y - constant.ScreenHeight
+		//} else if vPoint[1].Y < 0 {
+		//	newP.Position.Y = preda.Position.Y + constant.ScreenHeight
+		//}
 	}
 	preda.V1 = vPoint[0]
 	preda.V2 = vPoint[1]
 	if new {
 		vPoint2 = newP.Vision()
-		if (vPoint[1].X > constant.ScreenWidth || vPoint[1].X < 0) || (vPoint[1].Y > constant.ScreenHeight || vPoint[1].Y < 0) {
+		if vPoint[1].X > constant.ScreenWidth || vPoint[1].X < 0 {
 			preda.V2 = vPoint2[1]
 
 		}
-		if (vPoint[0].X > constant.ScreenWidth || vPoint[0].X < 0) || (vPoint[0].Y > constant.ScreenHeight || vPoint[0].Y < 0) {
+		if vPoint[0].X > constant.ScreenWidth || vPoint[0].X < 0 {
 			preda.V1 = vPoint2[0]
 		}
 	}
@@ -411,11 +411,11 @@ func (preda *Predator) CheckEdges() bool {
 	} else if preda.Position.X > constant.ScreenWidth {
 		preda.Position.X = 0
 	}
-	if preda.Position.Y < 0 {
-		preda.Position.Y = constant.ScreenHeight
-	} else if preda.Position.Y > constant.ScreenHeight {
-		preda.Position.Y = 0
-	}
+	//if preda.Position.Y < 0 {
+	//	preda.Position.Y = constant.ScreenHeight
+	//} else if preda.Position.Y > constant.ScreenHeight {
+	//	preda.Position.Y = 0
+	//}
 	return false
 }
 
