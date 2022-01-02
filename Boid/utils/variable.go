@@ -1,4 +1,4 @@
-package variable
+package utils
 
 import (
 	ebiten "github.com/hajimehoshi/ebiten/v2"

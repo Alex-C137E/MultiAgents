@@ -1,40 +1,23 @@
 package flock
 
 import (
-	boid "gitlab.utc.fr/projet_ia04/Boid/agent/boid"
-	wall "gitlab.utc.fr/projet_ia04/Boid/agent/wall"
-	"gitlab.utc.fr/projet_ia04/Boid/utils/constant"
+	agent "gitlab.utc.fr/projet_ia04/Boid/agent"
+	worldelements "gitlab.utc.fr/projet_ia04/Boid/worldelements"
 )
 
+//Flock structure qui permet de garder en contexte tous les éléments du monde
 type Flock struct {
-	Boids     []*boid.Boid
-	Walls     []*wall.Wall
-	Predators []*boid.Predator
+	Boids     []*agent.Boid
+	Walls     []*worldelements.Wall
+	Predators []*agent.Predator
 }
 
+//Logic fonction permet de mettre à jours les agents
 func (flock *Flock) Logic(level int) {
 	for _, boid := range flock.Boids {
-		if !boid.CheckEdges() {
-			if !boid.CheckWalls(flock.Walls) {
-				boid.ApplyRules(flock.Boids, flock.Predators)
-			}
-		}
-		boid.ApplyMovement()
-
-		// Pour éviter que les poissons réussissent à s'échapper des murs de bombes
-		// dans les niveaux supérieurs ou égal au niveau 4: (le dernier niveau pour le moment)
-		// Dès que l'on detecte qu'ils ne sont pas où ils devraient être, on les fait réapparaitre au centre
-
-		if level >= 4 && (boid.Position.Y <= 0 || boid.Position.Y >= float64(constant.ScreenHeight)) {
-			boid.Position.Y = float64(constant.ScreenHeight) / 2
-		}
-
+		go boid.Update(level, flock.Walls, flock.Boids, flock.Predators)
 	}
 	for _, preda := range flock.Predators {
-		if !preda.CheckEdges() {
-			preda.ApplyRules(flock.Boids)
-			preda.CheckWalls(flock.Walls)
-		}
-		preda.ApplyMovement()
+		go preda.Update(flock.Walls, flock.Boids)
 	}
 }

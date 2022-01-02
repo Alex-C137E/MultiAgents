@@ -1,4 +1,4 @@
-package constant
+package utils
 
 const (
 	ScreenWidth              = 1152

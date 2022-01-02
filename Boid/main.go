@@ -6,90 +6,89 @@ import (
 	ebiten "github.com/hajimehoshi/ebiten/v2"
 	ebitenutil "github.com/hajimehoshi/ebiten/v2/ebitenutil"
 
-	music "gitlab.utc.fr/projet_ia04/Boid/agent/music"
+	agent "gitlab.utc.fr/projet_ia04/Boid/agent"
 	game "gitlab.utc.fr/projet_ia04/Boid/game"
-	constant "gitlab.utc.fr/projet_ia04/Boid/utils/constant"
-	variable "gitlab.utc.fr/projet_ia04/Boid/utils/variable"
+	utils "gitlab.utc.fr/projet_ia04/Boid/utils"
 )
 
+//init fonction permet de charger les images nécessaires au fonctionnement du jeu
 func init() {
-	fish, _, err := ebitenutil.NewImageFromFile("utils/fish/chevron-up.png")
+	fish, _, err := ebitenutil.NewImageFromFile("utils/images/chevron-up.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h := fish.Size()
-	variable.BirdImage = ebiten.NewImage(w-20, h-10)
+	utils.BirdImage = ebiten.NewImage(w-20, h-10)
 	op := &ebiten.DrawImageOptions{}
-	variable.BirdImage.DrawImage(fish, op)
+	utils.BirdImage.DrawImage(fish, op)
 
-	bomb, _, err := ebitenutil.NewImageFromFile("utils/fish/bomb.png")
+	bomb, _, err := ebitenutil.NewImageFromFile("utils/images/bomb.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	bombW, bombH := 24, 24
-	variable.WallImage = ebiten.NewImage(bombW, bombH)
-	variable.WallImage.DrawImage(bomb, op)
+	utils.WallImage = ebiten.NewImage(bombW, bombH)
+	utils.WallImage.DrawImage(bomb, op)
 
-	sand, _, err := ebitenutil.NewImageFromFile("utils/fish/sand2.png")
+	sand, _, err := ebitenutil.NewImageFromFile("utils/images/sand2.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	sW, sH := sand.Size()
-	variable.SandImage = ebiten.NewImage(sW, sH)
-	variable.SandImage.DrawImage(sand, op)
+	utils.SandImage = ebiten.NewImage(sW, sH)
+	utils.SandImage.DrawImage(sand, op)
 
-	fish1, _, err := ebitenutil.NewImageFromFile("utils/fish/poisson-2.png")
+	fish1, _, err := ebitenutil.NewImageFromFile("utils/images/poisson-2.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h = fish1.Size()
-	variable.FishImage1 = ebiten.NewImage(w, h)
-	variable.FishImage1.DrawImage(fish1, op)
+	utils.FishImage1 = ebiten.NewImage(w, h)
+	utils.FishImage1.DrawImage(fish1, op)
 
-	fish2, _, err := ebitenutil.NewImageFromFile("utils/fish/poisson-3.png")
+	fish2, _, err := ebitenutil.NewImageFromFile("utils/images/poisson-3.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h = fish2.Size()
-	variable.FishImage2 = ebiten.NewImage(w, h)
-	variable.FishImage2.DrawImage(fish2, op)
+	utils.FishImage2 = ebiten.NewImage(w, h)
+	utils.FishImage2.DrawImage(fish2, op)
 
-	fish3, _, err := ebitenutil.NewImageFromFile("utils/fish/poisson-5.png")
+	fish3, _, err := ebitenutil.NewImageFromFile("utils/images/poisson-5.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h = fish1.Size()
-	variable.FishImage3 = ebiten.NewImage(w, h)
-	variable.FishImage3.DrawImage(fish3, op)
+	utils.FishImage3 = ebiten.NewImage(w, h)
+	utils.FishImage3.DrawImage(fish3, op)
 
-	preda, _, err := ebitenutil.NewImageFromFile("utils/fish/predT3.png")
+	preda, _, err := ebitenutil.NewImageFromFile("utils/images/poisson-4.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h = fish1.Size()
-	variable.PredImage = ebiten.NewImage(w+100, h+100)
-	variable.PredImage.DrawImage(preda, op)
+	utils.PredImage = ebiten.NewImage(w+100, h+100)
+	utils.PredImage.DrawImage(preda, op)
 
-	back, _, err := ebitenutil.NewImageFromFile("utils/fish/background.png")
+	back, _, err := ebitenutil.NewImageFromFile("utils/images/background.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	w, h = back.Size()
-	variable.BackgroundImage = ebiten.NewImage(w, h)
-	variable.BackgroundImage.DrawImage(back, op)
+	utils.BackgroundImage = ebiten.NewImage(w, h)
+	utils.BackgroundImage.DrawImage(back, op)
 
 }
 
 func main() {
-	// création de la chanel de sync pour la music:
-	c1 := make(chan string)
+	c1 := make(chan string) // création de la chanel de sync pour la music:
 
-	musicAgent := music.NewMusicAgent("utils/music/jaws.mp3", "utils/music/jaws.wav", c1)
+	musicAgent := agent.NewMusicAgent("utils/music/jaws.mp3", "utils/music/jaws.wav", c1) //chargement de la musique des Dents de la mer
 	musicAgent.Start()
 
-	ebiten.SetWindowSize(constant.ScreenWidth, constant.ScreenHeight)
-	ebiten.SetWindowTitle("Le Meilleur Jeu de Pêche SMA de la planète")
-	if err := ebiten.RunGame(game.NewGame(c1, 5)); err != nil {
+	ebiten.SetWindowSize(utils.ScreenWidth, utils.ScreenHeight)
+	ebiten.SetWindowTitle("Le Meilleur Jeu de Pêche SMA de la planète") //True story
+	if err := ebiten.RunGame(game.NewGame(c1, 5)); err != nil {         //lancement du jeu
 		log.Fatal(err)
 	}
 }
