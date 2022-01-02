@@ -16,9 +16,9 @@ import (
 )
 
 type MusicAgent struct {
-	mp3FileTitle string
-	wavFileTite  string
-	sync         chan string
+	mp3FileTitle string // pour lire la musique et la controler via l'utilisation de Beep
+	wavFileTite  string // pour obtenir l'amplitude du signal sonore de la musique via l'utilisation de GoAudio/wave (implique le besoin d'ajouter le fichier de musique en version .wav en plus d'une version .mp3) 
+	sync         chan string // pour comuniquer les variations d'amplitude au jeu (game) afin que les comportements des poisons puissent être modifier en fonction de la musique
 }
 
 func NewMusicAgent(mp3FileTitle string, wavFileTite string, sync chan string) *MusicAgent {
@@ -27,6 +27,7 @@ func NewMusicAgent(mp3FileTitle string, wavFileTite string, sync chan string) *M
 
 func (musicAgent *MusicAgent) Start() {
 	go func() {
+		// lecture du fichier mp3 pour lire et lancer la musique
 		f, err := os.Open(musicAgent.mp3FileTitle)
 		if err != nil {
 			report(err)
@@ -49,7 +50,9 @@ func (musicAgent *MusicAgent) Start() {
 		}
 		defer screen.Fini()
 
+		// récupération de l'amplitude du signal audio de la musique au travers du fichie.wav
 		wave, err := pkg.ReadWaveFile(musicAgent.wavFileTite)
+		// wave de type Wave possède comme attribut: un tableau de Frames d’indice i représentant l'amplitude du signal provenant du fichier .wav pour chaque échantillon i du signal.
 		if err != nil {
 			panic("Could not parse wave file")
 		}
@@ -93,13 +96,15 @@ func (musicAgent *MusicAgent) Start() {
 				ap.draw(screen)
 				screen.Show()
 
-			//Observation de la musique toute les microsecondes
+			//Observation de la musique toute les microsecondes:
 			case <-MicroSeconds.C:
 				speaker.Lock()
+				// Grace à l’attribut streamer de notre audioPanel (voir suite du code) donnant l’échantillon i du signal de la musique en cours de lecture, pouvons récupérer l’amplitude du signal audio toutes les microsecondes et le stocker dans amplitude
 				sr := ap.streamer.Position()
 				amplitude := ap.samples[sr]
 				speaker.Unlock()
 
+				// communication avec game en fonction des variations d'amplitude du signal sonore:
 				if amplitude > 0.5 {
 					ap.sync <- "very hard drop"
 				} else if amplitude > 0.3 {
@@ -129,6 +134,9 @@ func drawTextLine(screen tcell.Screen, x, y int, s string, style tcell.Style) {
 		x++
 	}
 }
+
+// Comme vu plus haut Beep nous a permis de  lire un fichier mp3 via Go au travers d’un agent musicale: MusicAgent. En plus de cela Beep nous a permis de générer dans la fonction Start de l'agent musical: un audioPanel à l’aide du tutoriel présent à l’adresse suivante: https://github.com/faiface/beep/wiki.
+// Ainsi nous pouvions modifier la position, le volume et la vitesse de la musique en lecture.
 
 type audioPanel struct {
 	sampleRate beep.SampleRate
