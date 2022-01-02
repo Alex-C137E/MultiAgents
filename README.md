@@ -12,7 +12,6 @@
 #### Enjeux 
 
 - Rendu artistique 
-
 - Comprendre les méchanismes régissants la dynamique d'un ecosysteme. 
 
 Les questions auxquelles nous souhaitons répondre à travers cette simulation sont les suivantes : 
@@ -36,22 +35,12 @@ https://uwe-repository.worktribe.com/output/980579
 
 ### Modules 
 
-- modélisation des agents (agents boids, agents perturbateurs)
-- modélisation du monde (runtime) -> Game 
-- rendu graphique 
-- analyse (macro, statistique)
+- agent -> structures des différents agents
+- flock -> context des différents agents et éléments qui composent le monde
+- game -> scoring et fonctions graphiques 
+- utils -> images, sons et fonctions usuelles
+- worldelements -> différents éléments présents dans le monde
 
-### Etapes 
-
-- Reproduire Boid tel quel (fait) ->   
-- refactoriser le code 
-- varier les 3 forces -> voir ce qu'on obtient (equilibre ?) 
-- injecter les agents perturbateurs -> étager le comportement -> quel comportement/quel ratio d'agents pour les equilibres qu'on a vu au dessus. 
-- Analyse 
-
-### A faire 
-
--refactorisation du code Vivien
-- gerer les effets de bord 
-- modélisation des états du boid pour tous les ratios de force possible 
+# Installation du projet
+Télécharger le dossier Boid et exécuter la commande "go run main.go". Les dossiers BoidEbiten et MusicSlime sont des ébauches qui peuvent vous intéresser si vous souhaitez suivre l'avancement du projet au cous du temps.
 
