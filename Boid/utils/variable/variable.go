@@ -12,6 +12,7 @@ var (
 	PredImage                  *ebiten.Image
 	BackgroundImage            *ebiten.Image
 	WallImage                  *ebiten.Image
+	SandImage                  *ebiten.Image
 	RepulsionFactorBtwnSpecies float64
 	SeparationPerception       float64
 	CohesionPerception         float64

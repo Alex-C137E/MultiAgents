@@ -290,18 +290,20 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 	var proie2 *Boid
 	var vPoint2 []Vector2D
 
-	//Tuer
+	//Tuer les boid se situant à une distance inférieure à 10
 	for _, Boid := range restOfFlock {
 		if (preda.Position.Distance(Boid.Position)) < 10 {
 			Boid.Dead = true
 		}
 	}
 
-	//Vision + stratégie d'attaque
+	//Calcule de la postion des points correspondant au champ de vision
 	vPoint := preda.Vision()
 	new = false
+	//Calcule nouveau point si 1 des premiers se situe à l'exterieur de la carte
 	if (vPoint[0].X > constant.ScreenWidth || vPoint[0].X < 0) || (vPoint[0].Y > constant.ScreenHeight || vPoint[0].Y < 0) || (vPoint[1].X > constant.ScreenWidth || vPoint[1].X < 0) || (vPoint[1].Y > constant.ScreenHeight || vPoint[1].Y < 0) {
 		new = true
+		//on crée également un objet predateur "fantome" (situer à X - ScreenWidth et Y + ScreenHeight) pour gérer la detection des boids de l'autre coté de la carte
 		newP = *preda
 		if vPoint[0].X > constant.ScreenWidth {
 			newP.Position.X = preda.Position.X - constant.ScreenWidth
@@ -338,16 +340,19 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 		}
 	}
 
+	//Pour chaque boid
 	for _, Boid := range restOfFlock {
 		if !Boid.Dead {
 			dens = 0
 			b := vector.PointInTriangle(Boid.Position, preda.Position, vPoint[0], vPoint[1])
 			b2 := false
+			//Si un point de vision dépasse les limites de la carte
 			if new {
 				b2 = vector.PointInTriangle(Boid.Position, newP.Position, vPoint2[0], vPoint2[1])
 			}
+			//Si il est dans le champ de vision du prédateur
 			if b {
-				//print(1)
+				//On calcule le nombre de voisin se situant à moins de 30 pixels de distance
 				for _, other := range restOfFlock {
 					if (Boid.Position.Distance(other.Position)) < 30 && !other.Dead {
 						dens++
@@ -359,6 +364,7 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 				proie1 = Boid
 			}
 			dens = 0
+			//Si un point de vision dépasse les limites de la carte
 			if b2 {
 				//print(1)
 				for _, other := range restOfFlock {
@@ -373,7 +379,9 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 			}
 		}
 	}
+	//Si une "zone" à une densité supérieur à preda.Density
 	if densMax >= densMax2 && densMax > preda.Density {
+		//On modifie le vecteur vitesse du prédateur pour le faire diriger dans la zone
 		Vit := vector.Vector2D{X: proie1.Position.X - preda.Position.X, Y: proie1.Position.Y - preda.Position.Y}
 		Vit.Normalize()
 		Vit.X = Vit.X * 10
@@ -387,6 +395,7 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 		Vit.Y = Vit.Y * 10
 		preda.Velocity = Vit
 	} else {
+		//Sinon on le fait ralentire jusqu'à une vitesse de 1
 		vit := preda.Velocity
 		if vit.X > 1 || -vit.X > 1 {
 			vit.X = vit.X * 0.98
@@ -394,6 +403,7 @@ func (preda *Predator) ApplyRules(restOfFlock []*Boid) {
 		if vit.Y > 1 || -vit.Y > 1 {
 			vit.Y = vit.Y * 0.98
 		}
+		//Si sa vitesse est éguale à 1 et que aucune zone ne dépasse la Densité minimum, on fait tourner aléatoirement le vecteur vitesse du prédateur
 		preda.Velocity = vector.Vector2D{X: vit.X, Y: vit.Y}
 		if rand.Float64() < 0.01 {
 			preda.Velocity = vector.Rotate(preda.Velocity, rand.Intn(10))
@@ -428,7 +438,9 @@ func (preda *Predator) CheckWalls(walls []*wall.Wall) {
 	} else {
 		for _, wall := range walls {
 			d := preda.Position.Distance(wall.Position)
+			//Si le prédateur est à moins de 20px d'un mur
 			if d <= 20 {
+				//On lui fait faire demi tour (et sotir de la zone d'action du mur)
 				preda.Velocity.Normalize()
 				preda.Velocity.X = -preda.Velocity.X * (100 - d + 1)
 				preda.Velocity.Y = -preda.Velocity.Y * (100 - d + 1)
