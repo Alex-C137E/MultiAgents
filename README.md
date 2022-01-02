@@ -7,6 +7,12 @@
 - CONSTANTIN Alexandre 
 - DESCAMPS Jean
 
+# Installation du projet
+Télécharger le dossier Boid et exécuter la commande "go run main.go". Les dossiers BoidEbiten et MusicSlime sont des ébauches qui peuvent vous intéresser si vous souhaitez suivre l'avancement du projet au cous du temps.
+
+## Lien vers la présentation
+https://docs.google.com/presentation/d/1l5LUCIg6quHnRC8MTebZ7FlemTd581bUhVjMK3kkw_c/edit?usp=sharing
+
 ### Comportements émergents et modélisation de la dynamique d'un ecosysteme
 
 #### Enjeux 
@@ -40,7 +46,3 @@ https://uwe-repository.worktribe.com/output/980579
 - game -> scoring et fonctions graphiques 
 - utils -> images, sons et fonctions usuelles
 - worldelements -> différents éléments présents dans le monde
-
-# Installation du projet
-Télécharger le dossier Boid et exécuter la commande "go run main.go". Les dossiers BoidEbiten et MusicSlime sont des ébauches qui peuvent vous intéresser si vous souhaitez suivre l'avancement du projet au cous du temps.
-
