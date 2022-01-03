@@ -211,7 +211,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.graphics.DrawBoids(screen, g.Flock.Boids)
 	g.graphics.DrawPredators(screen, g.Flock.Predators)
 	g.graphics.DrawWalls(screen, g.Flock.Walls)
-	g.graphics.DrawInterface(screen, g.currentScore, g.IsGameOver())
+	if g.currentLevel == len(g.levels)-1 && g.nextLevel() {
+		s := 0
+		for _, val := range g.scores {
+			s += val.Value
+		}
+		g.currentScore.Value = s
+		g.graphics.DrawInterface(screen, g.currentScore, false, true)
+	} else {
+		g.graphics.DrawInterface(screen, g.currentScore, g.IsGameOver(), false)
+	}
 }
 
 //Layout fonction qui retourne la taille de la fenêtre
