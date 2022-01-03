@@ -156,7 +156,7 @@ func (gra *Graphics) DrawWalls(screen *ebiten.Image, walls []*worldelements.Wall
 }
 
 //DrawInterface fonction qui permet d'afficher les différents textes de l'interface.
-func (g *Graphics) DrawInterface(screen *ebiten.Image, score Score, gameOver bool) {
+func (g *Graphics) DrawInterface(screen *ebiten.Image, score Score, gameOver bool, end bool) {
 	//Draw GUI
 	text.Draw(screen, "Level: "+strconv.Itoa(score.Level+1), g.scoreFont, 32, 32, color.RGBA{100, 100, 100, 255})
 	text.Draw(screen, "Score: "+strconv.Itoa(score.Value), g.scoreFont, utils.ScreenWidth/2-50, 32, color.RGBA{100, 100, 100, 255})
@@ -169,6 +169,10 @@ func (g *Graphics) DrawInterface(screen *ebiten.Image, score Score, gameOver boo
 
 	if gameOver {
 		text.Draw(screen, "Game over", g.scoreFont, utils.ScreenWidth/2-50, utils.ScreenHeight/2+132, color.RGBA{53, 223, 26, 255})
+	}
+
+	if end {
+		text.Draw(screen, "you won: ", g.scoreFont, utils.ScreenWidth/2-50, utils.ScreenHeight/2+132, color.RGBA{53, 223, 26, 255})
 	}
 
 	//Draw polygon
