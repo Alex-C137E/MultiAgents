@@ -46,3 +46,9 @@ https://uwe-repository.worktribe.com/output/980579
 - game -> scoring et fonctions graphiques 
 - utils -> images, sons et fonctions usuelles
 - worldelements -> différents éléments présents dans le monde
+
+
+
+
+
+lien vers le git:  https://gitlab.utc.fr/jedescam/projet_ia04
